@@ -1,0 +1,10 @@
+build/
+.dart_tool/
+.packages
+.pub-cache/
+.pub/
+.idea/
+*.iml
+*.lock
+**/Generated.xcconfig
+macos/Flutter/ephemeral/

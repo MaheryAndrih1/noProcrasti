@@ -1,0 +1,9 @@
+version: '3.9'
+services:
+  flutter:
+    build: .
+    container_name: noprocrasti_flutter
+    working_dir: /workspace
+    volumes:
+      - .:/workspace:cached
+    command: flutter test

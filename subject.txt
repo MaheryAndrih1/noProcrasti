@@ -1,0 +1,168 @@
+PROJET – Qualité de logiciel
+
+Sujet du Projet
+Vous êtes une équipe de développement logiciel chargée de concevoir, développer, tester
+et maintenir une application informatique réelle ou fictive en appliquant les principes de
+qualité logicielle étudiés:
+- ISO/IEC 25010
+- Plan d’Assurance Qualité (PAQ)
+- ITIL
+- CMMI
+- gestion des tests
+- audit qualité
+- gestion d’incident
+- gestion de changement
+- gestion de problème.
+Objectif Général
+Développer un mini projet informatique tout en mettant en œuvre un processus complet
+d’assurance qualité logicielle similaire aux pratiques utilisées dans les entreprises
+professionnelles.
+Sujet à Réaliser
+Chaque groupe doit choisir UN projet de votre choix ou parmi les propositions suivantes:
+1. Application de gestion de bibliothèque
+2. Système de gestion de stock
+3. Application de réservation d’hôtel
+4. Mini plateforme e-commerce
+5. Application bancaire simplifiée
+6. Gestion d’étudiants universitaires
+7. Gestion de pharmacie
+8. Application de gestion de tâches
+9. Plateforme de cours en ligne
+10. Gestion de restaurant
+
+11. Gestion de présence
+12. Gestion d’hôpital
+13. Mini réseau social
+14. Gestion de location de voitures
+15. Gestion de cybercafé
+Technologies Autorisées
+Langage et framework au choix :
+- Java
+- Python
+- PHP
+- JavaScript
+- Node.js
+- Django
+- Laravel
+- Spring Boot
+- React
+- Angular
+- Flutter
+- C#
+- autre technologie validée
+Travail à Réaliser
+PHASE 1 — PLAN D’ASSURANCE QUALITÉ (PAQ)
+Avant le développement, établir un document de Plan d’Assurance Qualité (PAQ)
+contenant :
+- présentation du projet
+- objectifs du système
+- fonctionnalités prévues
+- normes utilisées
+- critères de qualité ISO/IEC 25010
+
+- procédure de développement
+- stratégie de tests
+- procédure de validation
+- gestion des anomalies
+- outils utilisés
+PHASE 2 — CONCEPTION
+Réaliser:
+- diagrammes UML
+- architecture du système
+- modèle de base de données
+- maquettes/interfaces
+PHASE 3 — DÉVELOPPEMENT
+Développer l’application en respectant :
+- bonnes pratiques de codage
+- séparation des couches
+- validation des données
+- gestion des erreurs
+- sécurité minimale
+PHASE 4 — APPLICATION DE LA NORME ISO/IEC 25010
+Pour chaque fonctionnalité développée:
+1. Identifier les caractéristiques qualité concernées :
+- sécurité
+- performance
+- maintenabilité
+- fiabilité
+- utilisabilité
+- compatibilité
+- portabilité
+2. Vérifier si la fonctionnalité respecte les critères définis.
+3. Documenter les défauts détectés et les corrections effectuées.
+
+PHASE 5 — TESTS LOGICIELS
+Avant chaque commit Git :
+- créer les scénarios de test
+- créer les cas de test
+- exécuter les tests
+- corriger les anomalies
+Les tests doivent inclure :
+- tests fonctionnels
+- tests de validation
+- tests de sécurité
+- tests de performance
+PHASE 6 — OUTILS QUALITÉ
+Utiliser obligatoirement les outils suivants :
+- GitHub
+- SonarQube
+- OWASP ZAP
+- Apache JMeter
+- GLPI ou Zammad
+PHASE 7 — AUDIT QUALITÉ
+Mettre en place :
+- revue de code
+- audit qualité
+- suivi des anomalies
+- tableau de suivi qualité
+Produire :
+- rapport SonarQube
+- rapport OWASP ZAP
+- rapport JMeter
+
+PHASE 8 — APPLICATION DE ITIL
+Simuler la gestion du projet via ITIL.
+Gestion d’incident :
+- panne serveur
+- erreur système
+- indisponibilité application
+Gestion de problème :
+- identifier les causes racines
+- proposer des solutions permanentes
+Gestion de changement :
+- ajout d’une nouvelle fonctionnalité
+- modification base de données
+- mise à jour système
+PHASE 9 — APPLICATION DE CMMI
+Évaluer la maturité du projet selon les niveaux CMMI :
+1. Initial
+2. Répétable
+3. Défini
+4. Géré
+5. Optimisé
+PHASE 10 — VALIDATION FINALE
+Le testeur doit vérifier :
+- tous les scénarios de test
+- tous les cas de test
+- conformité avec le PAQ
+- conformité avec ISO/IEC 25010
+Livrables Attendus
+1. Document PAQ
+2. Diagrammes UML
+3. Code source complet
+4. Repository GitHub
+
+5. Cas et scénarios de test
+6. Rapport SonarQube
+7. Rapport OWASP ZAP
+8. Rapport JMeter
+9. Rapport ITIL
+10. Rapport CMMI
+11. Rapport final qualité logicielle
+12. Présentation finale
+Contraintes
+- utilisation obligatoire de Git/GitHub
+- commits réguliers obligatoires
+- utilisation réelle des outils qualité
+- démonstration fonctionnelle obligatoire
+- documentation obligatoire
