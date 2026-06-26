@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:uuid/uuid.dart';
@@ -25,6 +27,7 @@ class AppState extends ChangeNotifier {
   AppSettings settings = const AppSettings();
   bool isInitializing = true;
   bool busy = false;
+  Timer? _activeTaskTimer;
 
   AppState({
     AuthService? authService,
@@ -50,6 +53,7 @@ class AppState extends ChangeNotifier {
     suggestions = suggestionService.suggest(tasks);
 
     isInitializing = false;
+    _startActiveTimerIfNeeded();
     notifyListeners();
   }
 
@@ -89,6 +93,7 @@ class AppState extends ChangeNotifier {
       createdAt: DateTime.now(),
       dueDate: dueDate,
       estimatedDuration: estimatedDuration,
+      remainingDuration: estimatedDuration,
       orderIndex: tasks.length,
       status: TaskStatus.pending,
       priority: priority,
@@ -118,6 +123,11 @@ class AppState extends ChangeNotifier {
     await _saveAndRefresh();
   }
 
+  Future<void> deleteTask(Task task) async {
+    tasks = taskService.deleteTask(tasks, task);
+    await _saveAndRefresh();
+  }
+
   Future<void> _saveAndRefresh() async {
     await taskService.saveTasks(tasks);
     if (settings.notificationsEnabled) {
@@ -125,12 +135,50 @@ class AppState extends ChangeNotifier {
       await notificationService.scheduleOverdueNotifications(tasks);
     }
     suggestions = suggestionService.suggest(tasks);
+    _startActiveTimerIfNeeded();
     notifyListeners();
+  }
+
+  void _startActiveTimerIfNeeded() {
+    _activeTaskTimer?.cancel();
+    final activeTask = tasks.where((task) => task.status == TaskStatus.active).isNotEmpty
+        ? tasks.firstWhere((task) => task.status == TaskStatus.active)
+        : null;
+
+    if (activeTask == null) {
+      return;
+    }
+
+    _activeTaskTimer = Timer.periodic(const Duration(seconds: 1), (timer) async {
+      final latestActive = tasks.where((task) => task.status == TaskStatus.active).isNotEmpty
+          ? tasks.firstWhere((task) => task.status == TaskStatus.active)
+          : null;
+
+      if (latestActive == null) {
+        timer.cancel();
+        return;
+      }
+
+      if (latestActive.effectiveRemaining <= Duration.zero) {
+        timer.cancel();
+        tasks = taskService.updateStatus(tasks, latestActive, TaskStatus.done);
+        await _saveAndRefresh();
+        return;
+      }
+
+      notifyListeners();
+    });
   }
 
   Future<void> updateSettings(AppSettings newSettings) async {
     settings = newSettings;
     await settingsService.saveSettings(settings);
     notifyListeners();
+  }
+
+  @override
+  void dispose() {
+    _activeTaskTimer?.cancel();
+    super.dispose();
   }
 }

@@ -63,6 +63,7 @@ class _FloatingAssistantWidgetState extends State<FloatingAssistantWidget> {
         createdAt: DateTime.now(),
         dueDate: DateTime.now().add(const Duration(hours: 1)),
         estimatedDuration: const Duration(minutes: 30),
+        remainingDuration: const Duration(minutes: 30),
         orderIndex: 0,
         status: TaskStatus.pending,
         priority: TaskPriority.medium,

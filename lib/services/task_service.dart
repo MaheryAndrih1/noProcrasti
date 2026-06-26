@@ -17,11 +17,36 @@ class TaskService {
     return tasks.map((item) {
       if (item.id != task.id) {
         if (status == TaskStatus.active && item.status == TaskStatus.active) {
-          return item.copyWith(status: TaskStatus.paused);
+          return item.copyWith(
+            status: TaskStatus.paused,
+            remainingDuration: item.effectiveRemaining,
+            lastStartedAt: null,
+          );
         }
         return item;
       }
-      return item.copyWith(status: status);
+
+      switch (status) {
+        case TaskStatus.active:
+          return item.copyWith(
+            status: TaskStatus.active,
+            lastStartedAt: DateTime.now(),
+          );
+        case TaskStatus.paused:
+          return item.copyWith(
+            status: TaskStatus.paused,
+            remainingDuration: item.effectiveRemaining,
+            lastStartedAt: null,
+          );
+        case TaskStatus.done:
+          return item.copyWith(
+            status: TaskStatus.done,
+            remainingDuration: Duration.zero,
+            lastStartedAt: null,
+          );
+        default:
+          return item.copyWith(status: status, lastStartedAt: null);
+      }
     }).toList();
   }
 
@@ -30,6 +55,10 @@ class TaskService {
     final item = items.removeAt(oldIndex);
     items.insert(newIndex, item);
     return _normalizeOrder(items);
+  }
+
+  List<Task> deleteTask(List<Task> tasks, Task task) {
+    return tasks.where((item) => item.id != task.id).toList();
   }
 
   List<Task> _normalizeOrder(List<Task> tasks) {
