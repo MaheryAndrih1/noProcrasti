@@ -25,6 +25,11 @@ class _DashboardViewState extends State<DashboardView> {
         title: const Text('noProcrasti'),
         actions: [
           IconButton(
+            icon: const Icon(Icons.logout),
+            tooltip: 'Sign out',
+            onPressed: () => context.read<AppState>().signOut(),
+          ),
+          IconButton(
             icon: const Icon(Icons.settings),
             onPressed: () => Navigator.pushNamed(context, PreferencesView.routeName),
           ),

@@ -22,6 +22,7 @@ class NoProcrastiApp extends StatelessWidget {
       child: Consumer<AppState>(
         builder: (context, state, child) {
           return MaterialApp(
+            debugShowCheckedModeBanner: false,
             title: 'noProcrasti',
             theme: ThemeData(
               colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),

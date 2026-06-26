@@ -52,6 +52,12 @@ class PreferencesView extends StatelessWidget {
                   if (value != null) state.updateSettings(settings.copyWith(themeMode: value));
                 },
               ),
+              const SizedBox(height: 24),
+              OutlinedButton.icon(
+                onPressed: state.isInitializing ? null : () => state.signOut(),
+                icon: const Icon(Icons.logout),
+                label: const Text('Sign out'),
+              ),
             ],
           );
         },
