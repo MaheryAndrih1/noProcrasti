@@ -4,6 +4,7 @@ import 'providers/app_state.dart';
 import 'views/dashboard_view.dart';
 import 'views/login_view.dart';
 import 'views/preferences_view.dart';
+import 'views/signup_view.dart';
 import 'views/task_form_view.dart';
 
 void main() {
@@ -36,6 +37,7 @@ class NoProcrastiApp extends StatelessWidget {
             home: const RootScreen(),
             routes: {
               LoginView.routeName: (_) => const LoginView(),
+              SignupView.routeName: (_) => const SignupView(),
               DashboardView.routeName: (_) => const DashboardView(),
               TaskFormView.routeName: (_) => const TaskFormView(),
               PreferencesView.routeName: (_) => const PreferencesView(),

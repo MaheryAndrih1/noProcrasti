@@ -73,12 +73,18 @@ class Task {
 
   String get remainingLabel {
     final remaining = effectiveRemaining;
-    final minutes = remaining.inMinutes.remainder(60).toString().padLeft(2, '0');
-    final seconds = remaining.inSeconds.remainder(60).toString().padLeft(2, '0');
-    return '${remaining.inHours.toString().padLeft(2, '0')}:$minutes:$seconds';
+    final isOverrun = remaining.isNegative;
+    final duration = remaining.abs();
+    final hours = duration.inHours.toString().padLeft(2, '0');
+    final minutes = duration.inMinutes.remainder(60).toString().padLeft(2, '0');
+    final seconds = duration.inSeconds.remainder(60).toString().padLeft(2, '0');
+    final formatted = '$hours:$minutes:$seconds';
+    return isOverrun ? '+$formatted overdue' : formatted;
   }
 
   bool get isOverdue => status != TaskStatus.done && dueDate.isBefore(DateTime.now());
+  bool get isOverrun => status == TaskStatus.active && effectiveRemaining.isNegative;
+  Duration get overdueDuration => isOverrun ? effectiveRemaining.abs() : Duration.zero;
   bool get isWaiting => status == TaskStatus.paused;
   bool get isInWaitingPhase => status == TaskStatus.paused;
   String get dueDateLabel => DateFormat.yMMMEd().add_jm().format(dueDate);

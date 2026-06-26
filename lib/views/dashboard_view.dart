@@ -3,7 +3,6 @@ import 'package:provider/provider.dart';
 
 import '../models/task.dart';
 import '../providers/app_state.dart';
-import '../widgets/floating_assistant_widget.dart';
 import 'preferences_view.dart';
 import 'task_detail_view.dart';
 import 'task_form_view.dart';
@@ -17,29 +16,7 @@ class DashboardView extends StatefulWidget {
   State<DashboardView> createState() => _DashboardViewState();
 }
 
-class _DashboardViewState extends State<DashboardView> with WidgetsBindingObserver {
-  bool _isInBackground = false;
-
-  @override
-  void initState() {
-    super.initState();
-    WidgetsBinding.instance.addObserver(this);
-    final state = WidgetsBinding.instance.lifecycleState;
-    _isInBackground = state != AppLifecycleState.resumed;
-  }
-
-  @override
-  void dispose() {
-    WidgetsBinding.instance.removeObserver(this);
-    super.dispose();
-  }
-
-  @override
-  void didChangeAppLifecycleState(AppLifecycleState state) {
-    setState(() {
-      _isInBackground = state != AppLifecycleState.resumed;
-    });
-  }
+class _DashboardViewState extends State<DashboardView> {
 
   @override
   Widget build(BuildContext context) {
@@ -66,8 +43,6 @@ class _DashboardViewState extends State<DashboardView> with WidgetsBindingObserv
           final Task? activeTask = remainingTasks.where((task) => task.status == TaskStatus.active).isNotEmpty
               ? remainingTasks.firstWhere((task) => task.status == TaskStatus.active)
               : null;
-          final bool showAssistant = state.settings.showFloatingWidget && _isInBackground;
-
           return Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
@@ -89,6 +64,28 @@ class _DashboardViewState extends State<DashboardView> with WidgetsBindingObserv
                   ],
                 ),
               ),
+              if (state.overdueNotificationMessage != null)
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  child: Card(
+                    color: Theme.of(context).colorScheme.errorContainer,
+                    child: Padding(
+                      padding: const EdgeInsets.all(12),
+                      child: Row(
+                        children: [
+                          const Icon(Icons.warning_amber_rounded, color: Colors.white),
+                          const SizedBox(width: 10),
+                          Expanded(
+                            child: Text(
+                              state.overdueNotificationMessage!,
+                              style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
               if (activeTask != null) _ActiveTaskCard(task: activeTask),
           if (suggestions.isNotEmpty) _SuggestionSection(suggestions: suggestions),
           if (doneTasks.isNotEmpty) _CompletedSection(doneTasks: doneTasks),
@@ -105,7 +102,6 @@ class _DashboardViewState extends State<DashboardView> with WidgetsBindingObserv
                               return _TaskTile(key: ValueKey(task.id), task: task);
                             },
                           ),
-                          if (showAssistant) const FloatingAssistantWidget(),
                         ],
                       ),
               ),

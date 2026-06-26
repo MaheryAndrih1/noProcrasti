@@ -27,6 +27,9 @@ class AppState extends ChangeNotifier {
   AppSettings settings = const AppSettings();
   bool isInitializing = true;
   bool busy = false;
+  String? authMessage;
+  String? overdueNotificationMessage;
+  final Set<String> _notifiedOverdueTaskIds = {};
   Timer? _activeTaskTimer;
 
   AppState({
@@ -57,18 +60,43 @@ class AppState extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> signIn() async {
+  Future<void> signInWithEmail(String email, String password) async {
     busy = true;
+    authMessage = null;
     notifyListeners();
 
-    currentUser = await authService.signInWithGoogle();
-    if (currentUser != null) {
+    final signedIn = await authService.signInWithEmail(email, password);
+    if (signedIn != null) {
+      currentUser = signedIn;
       tasks = await taskService.loadTasks();
       suggestions = suggestionService.suggest(tasks);
+    } else {
+      authMessage = 'Invalid credentials. Try signing up or check your email/password.';
     }
 
     busy = false;
     notifyListeners();
+  }
+
+  Future<bool> registerUser({
+    required String username,
+    required String email,
+    required String password,
+  }) async {
+    busy = true;
+    authMessage = null;
+    notifyListeners();
+
+    final registered = await authService.registerUser(
+      username: username,
+      email: email,
+      password: password,
+    );
+
+    busy = false;
+    authMessage = registered ? 'Account created. Please log in.' : 'Failed to create account.';
+    notifyListeners();
+    return registered;
   }
 
   Future<void> signOut() async {
@@ -135,6 +163,10 @@ class AppState extends ChangeNotifier {
       await notificationService.scheduleOverdueNotifications(tasks);
     }
     suggestions = suggestionService.suggest(tasks);
+    if (tasks.where((task) => task.isOverrun).isEmpty) {
+      overdueNotificationMessage = null;
+      _notifiedOverdueTaskIds.clear();
+    }
     _startActiveTimerIfNeeded();
     notifyListeners();
   }
@@ -154,15 +186,17 @@ class AppState extends ChangeNotifier {
           ? tasks.firstWhere((task) => task.status == TaskStatus.active)
           : null;
 
-      if (latestActive == null) {
+        if (latestActive == null) {
         timer.cancel();
         return;
       }
 
       if (latestActive.effectiveRemaining <= Duration.zero) {
-        timer.cancel();
-        tasks = taskService.updateStatus(tasks, latestActive, TaskStatus.done);
-        await _saveAndRefresh();
+        if (!_notifiedOverdueTaskIds.contains(latestActive.id)) {
+          overdueNotificationMessage = 'Overdue task: ${latestActive.title}';
+          _notifiedOverdueTaskIds.add(latestActive.id);
+        }
+        notifyListeners();
         return;
       }
 

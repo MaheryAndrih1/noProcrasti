@@ -26,13 +26,6 @@ class PreferencesView extends StatelessWidget {
                   state.updateSettings(settings.copyWith(notificationsEnabled: value));
                 },
               ),
-              SwitchListTile(
-                title: const Text('Floating assistant'),
-                value: settings.showFloatingWidget,
-                onChanged: (value) {
-                  state.updateSettings(settings.copyWith(showFloatingWidget: value));
-                },
-              ),
               const SizedBox(height: 16),
               const Text('Theme', style: TextStyle(fontWeight: FontWeight.bold)),
               RadioListTile<ThemeMode>(

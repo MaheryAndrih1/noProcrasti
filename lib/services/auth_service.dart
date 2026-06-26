@@ -1,68 +1,56 @@
 import 'dart:convert';
-import 'dart:io' show Platform;
 
-import 'package:google_sign_in/google_sign_in.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../models/user.dart';
 
 class AuthService {
   static const _userKey = 'noprocrasti_user';
-  final GoogleSignIn _googleSignIn = GoogleSignIn(scopes: ['email']);
+  static const _credentialsKey = 'noprocrasti_credentials';
 
   Future<AppUser?> restoreSession() async {
     final prefs = await SharedPreferences.getInstance();
     final json = prefs.getString(_userKey);
-    if (json == null) {
-      return null;
-    }
+    if (json == null) return null;
 
     final map = jsonDecode(json) as Map<String, dynamic>;
     return AppUser.fromJson(map);
   }
 
-  Future<AppUser?> signInWithGoogle() async {
-    if (!Platform.isAndroid && !Platform.isIOS) {
-      final fallback = AppUser(
-        id: 'local-user',
-        name: 'Local User',
-        email: 'local@noProcrasti.dev',
+  Future<AppUser?> signInWithEmail(String email, String password) async {
+    final prefs = await SharedPreferences.getInstance();
+    final credentialsJson = prefs.getString(_credentialsKey);
+    if (credentialsJson == null) return null;
+
+    final credentials = jsonDecode(credentialsJson) as Map<String, dynamic>;
+    if (credentials['email'] == email && credentials['password'] == password) {
+      final user = AppUser(
+        id: credentials['id'] as String,
+        name: credentials['name'] as String,
+        email: email,
         avatarUrl: null,
       );
-      await _saveUser(fallback);
-      return fallback;
-    }
-
-    try {
-      final account = await _googleSignIn.signIn();
-      if (account == null) {
-        return null;
-      }
-
-      final user = AppUser(
-        id: account.id,
-        name: account.displayName ?? account.email,
-        email: account.email,
-        avatarUrl: account.photoUrl,
-      );
-
       await _saveUser(user);
       return user;
-    } catch (error) {
-      print('Google sign-in failed, falling back to local user: $error');
-      final fallback = AppUser(
-        id: 'local-user',
-        name: 'Local User',
-        email: 'local@noProcrasti.dev',
-        avatarUrl: null,
-      );
-      await _saveUser(fallback);
-      return fallback;
     }
+
+    return null;
+  }
+
+  Future<bool> registerUser({required String username, required String email, required String password}) async {
+    final prefs = await SharedPreferences.getInstance();
+    final credentials = {
+      'id': DateTime.now().millisecondsSinceEpoch.toString(),
+      'name': username,
+      'email': email,
+      'password': password,
+    };
+
+    await prefs.setString(_credentialsKey, jsonEncode(credentials));
+    return true;
   }
 
   Future<void> signOut() async {
-    await _googleSignIn.signOut();
     final prefs = await SharedPreferences.getInstance();
     await prefs.remove(_userKey);
   }
