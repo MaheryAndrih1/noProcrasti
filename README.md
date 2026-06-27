@@ -111,5 +111,4 @@ Pour une prochaine étape, un vrai workflow Git intégré (ouvrir un dépôt, co
 
 ## Remarques
 
-- Le projet est documenté pour les plateformes Flutter disponibles dans votre environnement, avec une validation pratique sur le flux desktop et Docker/web du dépôt.
-- L'application utilise une authentification locale pour la démonstration.
+- Le projet est documenté pour les plateformes Flutter disponibles dans votre environnement, avec une validation pratique sur le flux desktop et Docker/web du dépôt
