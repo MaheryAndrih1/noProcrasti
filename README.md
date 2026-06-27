@@ -32,7 +32,7 @@ Les livrables qualité sont regroupés dans [docs/README.md](docs/README.md).
 1. Ajoutez Flutter au `PATH` si nécessaire :
 
 ```bash
-export PATH="$PATH:/Users/maheriniainaandrianaivo/code/flutter/bin"
+export PATH="$PATH:/Users/user/code/flutter/bin"
 ```
 
 2. Récupérez les dépendances :
