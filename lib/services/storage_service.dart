@@ -1,29 +1,35 @@
-import 'dart:convert';
-
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:hive/hive.dart';
 
 import '../models/task.dart';
 
 class StorageService {
-  static const _tasksKey = 'noprocrasti_tasks';
+  static const _tasksBoxPrefix = 'noprocrasti_tasks_';
 
-  Future<List<Task>> loadTasks() async {
-    final prefs = await SharedPreferences.getInstance();
-    final jsonString = prefs.getString(_tasksKey);
-    if (jsonString == null) {
-      return [];
+  String _tasksBoxNameFor(String userId) => '$_tasksBoxPrefix$userId';
+
+  Future<Box> _openTasksBox(String userId) async {
+    final boxName = _tasksBoxNameFor(userId);
+    if (Hive.isBoxOpen(boxName)) {
+      return Hive.box(boxName);
     }
 
-    final list = jsonDecode(jsonString) as List<dynamic>;
-    return list
-        .cast<Map<String, dynamic>>()
-        .map(Task.fromJson)
-        .toList();
+    return Hive.openBox(boxName);
   }
 
-  Future<void> saveTasks(List<Task> tasks) async {
-    final prefs = await SharedPreferences.getInstance();
-    final jsonString = jsonEncode(tasks.map((task) => task.toJson()).toList());
-    await prefs.setString(_tasksKey, jsonString);
+  Future<List<Task>> loadTasks({required String userId}) async {
+    final box = await _openTasksBox(userId);
+    final tasks = box.values
+        .whereType<Map>()
+        .map((value) => Task.fromJson(Map<String, dynamic>.from(value)))
+        .toList();
+
+    tasks.sort((left, right) => left.orderIndex.compareTo(right.orderIndex));
+    return tasks;
+  }
+
+  Future<void> saveTasks(List<Task> tasks, {required String userId}) async {
+    final box = await _openTasksBox(userId);
+    await box.clear();
+    await box.putAll({for (final task in tasks) task.id: task.toJson()});
   }
 }

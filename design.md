@@ -18,12 +18,4 @@ flowchart TD
     H --> O[Completed task]
     D --> P[Popup suggestions]
     P --> M
-    D --> Q[Floating widget]
-    Q --> R[Drag / Stick to screen edge]
-    R --> S[Hover / tap detail view]
-    S --> T[Pause / Done actions]
-    S --> K
-    Q --> U[Mobile notification tray]
-    U --> V[Show current task info]
-    U --> K
 ```

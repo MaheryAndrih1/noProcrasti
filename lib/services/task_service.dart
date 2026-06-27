@@ -6,11 +6,11 @@ class TaskService {
 
   TaskService({required this.storageService});
 
-  Future<List<Task>> loadTasks() => storageService.loadTasks();
+  Future<List<Task>> loadTasks({required String userId}) => storageService.loadTasks(userId: userId);
 
-  Future<void> saveTasks(List<Task> tasks) {
+  Future<void> saveTasks(List<Task> tasks, {required String userId}) {
     final normalized = _normalizeOrder(tasks);
-    return storageService.saveTasks(normalized);
+    return storageService.saveTasks(normalized, userId: userId);
   }
 
   List<Task> updateStatus(List<Task> tasks, Task task, TaskStatus status) {

@@ -7,10 +7,10 @@ class _FakeStorageService extends StorageService {
   List<Task> tasks = [];
 
   @override
-  Future<List<Task>> loadTasks() async => tasks;
+  Future<List<Task>> loadTasks({required String userId}) async => tasks;
 
   @override
-  Future<void> saveTasks(List<Task> tasks) async {
+  Future<void> saveTasks(List<Task> tasks, {required String userId}) async {
     this.tasks = tasks;
   }
 }

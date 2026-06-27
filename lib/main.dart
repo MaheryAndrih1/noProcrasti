@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 import 'package:provider/provider.dart';
 import 'providers/app_state.dart';
 import 'views/dashboard_view.dart';
@@ -7,8 +8,9 @@ import 'views/preferences_view.dart';
 import 'views/signup_view.dart';
 import 'views/task_form_view.dart';
 
-void main() {
+Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await Hive.initFlutter();
   runApp(const NoProcrastiApp());
 }
 
@@ -57,10 +59,6 @@ class RootScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Consumer<AppState>(
       builder: (context, state, child) {
-        if (state.isInitializing) {
-          return const Scaffold(body: Center(child: CircularProgressIndicator()));
-        }
-
         if (state.currentUser == null) {
           return const LoginView();
         }

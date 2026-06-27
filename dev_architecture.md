@@ -13,7 +13,7 @@ Ce document décrit le dataflow, les services existants et le comportement du co
 ## Dataflow principal
 1. L'utilisateur ouvre l'application.
 2. L'application vérifie l'état de session via `AuthService`.
-3. Si non connecté, l'utilisateur s'authentifie via Google Sign-In.
+3. Si non connecté, l'utilisateur s'authentifie via email et mot de passe.
 4. Après connexion, `TaskService` charge les tâches depuis le stockage.
 5. Le tableau de bord s'affiche avec la liste des tâches ordonnées.
 6. L'utilisateur démarre, met en pause ou termine une tâche.
@@ -23,9 +23,8 @@ Ce document décrit le dataflow, les services existants et le comportement du co
 
 ## Services existants
 - `AuthService`
-  - login/logout
+  - login/logout local
   - gestion de session
-  - Google Sign-In
   - récupération des informations utilisateur
 
 - `TaskService`
@@ -39,7 +38,6 @@ Ce document décrit le dataflow, les services existants et le comportement du co
   - notifications locales
   - rappels de retard
   - suggestions au moment d'une pause ou d'une fin de tâche
-  - affichage en notification tray mobile
 
 - `SuggestionService`
   - analyse des tâches en cours, en pause et programmées
@@ -48,8 +46,8 @@ Ce document décrit le dataflow, les services existants et le comportement du co
   - gestion de l’option future AI
 
 - `StorageService`
-  - interface de stockage des données
-  - support local (SQLite / Hive) ou cloud (Firebase)
+  - base Hive locale pour les tâches
+  - `SharedPreferences` reste utilisé pour la session et les réglages
   - sérialisation / désérialisation des tâches et de l’utilisateur
 
 ## Comportement du code

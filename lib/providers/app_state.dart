@@ -32,6 +32,8 @@ class AppState extends ChangeNotifier {
   final Set<String> _notifiedOverdueTaskIds = {};
   Timer? _activeTaskTimer;
 
+  String? get _currentUserId => currentUser?.id;
+
   AppState({
     AuthService? authService,
     TaskService? taskService,
@@ -52,7 +54,7 @@ class AppState extends ChangeNotifier {
 
     currentUser = await authService.restoreSession();
     settings = await settingsService.loadSettings();
-    tasks = await taskService.loadTasks();
+    tasks = currentUser == null ? [] : await taskService.loadTasks(userId: currentUser!.id);
     suggestions = suggestionService.suggest(tasks);
 
     isInitializing = false;
@@ -60,7 +62,7 @@ class AppState extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> signInWithEmail(String email, String password) async {
+  Future<bool> signInWithEmail(String email, String password) async {
     busy = true;
     authMessage = null;
     notifyListeners();
@@ -68,14 +70,18 @@ class AppState extends ChangeNotifier {
     final signedIn = await authService.signInWithEmail(email, password);
     if (signedIn != null) {
       currentUser = signedIn;
-      tasks = await taskService.loadTasks();
+      tasks = await taskService.loadTasks(userId: signedIn.id);
       suggestions = suggestionService.suggest(tasks);
+      busy = false;
+      notifyListeners();
+      return true;
     } else {
       authMessage = 'Invalid credentials. Try signing up or check your email/password.';
     }
 
     busy = false;
     notifyListeners();
+    return false;
   }
 
   Future<bool> registerUser({
@@ -101,9 +107,13 @@ class AppState extends ChangeNotifier {
 
   Future<void> signOut() async {
     await authService.signOut();
+    _activeTaskTimer?.cancel();
     currentUser = null;
     tasks = [];
     suggestions = [];
+    authMessage = null;
+    overdueNotificationMessage = null;
+    _notifiedOverdueTaskIds.clear();
     notifyListeners();
   }
 
@@ -157,7 +167,12 @@ class AppState extends ChangeNotifier {
   }
 
   Future<void> _saveAndRefresh() async {
-    await taskService.saveTasks(tasks);
+    final userId = _currentUserId;
+    if (userId == null) {
+      return;
+    }
+
+    await taskService.saveTasks(tasks, userId: userId);
     if (settings.notificationsEnabled) {
       await notificationService.initialize();
       await notificationService.scheduleOverdueNotifications(tasks);

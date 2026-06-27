@@ -1,4 +1,3 @@
-
 services:
   flutter:
     build: .
@@ -7,3 +6,13 @@ services:
     volumes:
       - .:/workspace:cached
     command: flutter test
+
+  app:
+    build: .
+    container_name: noprocrasti_app
+    working_dir: /workspace
+    volumes:
+      - .:/workspace:cached
+    command: flutter run -d web-server --web-hostname=0.0.0.0 --web-port=3000
+    ports:
+      - "3000:3000"

@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 
 import '../models/task.dart';
 import '../providers/app_state.dart';
+import 'login_view.dart';
 import 'preferences_view.dart';
 import 'task_detail_view.dart';
 import 'task_form_view.dart';
@@ -17,6 +18,43 @@ class DashboardView extends StatefulWidget {
 }
 
 class _DashboardViewState extends State<DashboardView> {
+  Future<void> _confirmLogout(BuildContext context, AppState state, Task? activeTask) async {
+    if (activeTask == null) {
+      await state.signOut();
+      if (!context.mounted) return;
+      Navigator.of(context).pushNamedAndRemoveUntil(LoginView.routeName, (route) => false);
+      return;
+    }
+
+    final shouldLogout = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) {
+        return AlertDialog(
+          title: const Text('Pause task before logout?'),
+          content: Text(
+            'Your "${activeTask.title}" task is running. It will be paused before you log out.',
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(dialogContext).pop(false),
+              child: const Text('Cancel'),
+            ),
+            FilledButton(
+              onPressed: () => Navigator.of(dialogContext).pop(true),
+              child: const Text('Pause and log out'),
+            ),
+          ],
+        );
+      },
+    );
+
+    if (shouldLogout != true) return;
+
+    await state.pauseTask(activeTask);
+    await state.signOut();
+    if (!context.mounted) return;
+    Navigator.of(context).pushNamedAndRemoveUntil(LoginView.routeName, (route) => false);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -27,7 +65,13 @@ class _DashboardViewState extends State<DashboardView> {
           IconButton(
             icon: const Icon(Icons.logout),
             tooltip: 'Sign out',
-            onPressed: () => context.read<AppState>().signOut(),
+            onPressed: () async {
+              final state = context.read<AppState>();
+              final activeTask = state.tasks.where((task) => task.status == TaskStatus.active).isNotEmpty
+                  ? state.tasks.firstWhere((task) => task.status == TaskStatus.active)
+                  : null;
+              await _confirmLogout(context, state, activeTask);
+            },
           ),
           IconButton(
             icon: const Icon(Icons.settings),

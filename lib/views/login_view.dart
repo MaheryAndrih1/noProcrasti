@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../providers/app_state.dart';
+import 'dashboard_view.dart';
 import 'signup_view.dart';
 
 class LoginView extends StatefulWidget {
@@ -28,10 +29,13 @@ class _LoginViewState extends State<LoginView> {
   Future<void> _submit() async {
     if (!_formKey.currentState!.validate()) return;
     final appState = context.read<AppState>();
-    await appState.signInWithEmail(
+    final signedIn = await appState.signInWithEmail(
       _emailController.text.trim(),
       _passwordController.text,
     );
+
+    if (!mounted || !signedIn) return;
+    Navigator.of(context).pushNamedAndRemoveUntil(DashboardView.routeName, (route) => false);
   }
 
   @override
@@ -45,6 +49,19 @@ class _LoginViewState extends State<LoginView> {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
+                  Consumer<AppState>(
+                    builder: (context, state, child) {
+                      return AnimatedSwitcher(
+                        duration: const Duration(milliseconds: 200),
+                        child: state.isInitializing
+                            ? const Padding(
+                                padding: EdgeInsets.only(bottom: 16),
+                                child: LinearProgressIndicator(minHeight: 3),
+                              )
+                            : const SizedBox(height: 16),
+                      );
+                    },
+                  ),
                   const Text('noProcrasti', style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold)),
                   const SizedBox(height: 16),
                   const Text(

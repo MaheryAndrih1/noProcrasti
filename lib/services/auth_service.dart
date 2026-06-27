@@ -22,16 +22,22 @@ class AuthService {
     final credentialsJson = prefs.getString(_credentialsKey);
     if (credentialsJson == null) return null;
 
-    final credentials = jsonDecode(credentialsJson) as Map<String, dynamic>;
-    if (credentials['email'] == email && credentials['password'] == password) {
-      final user = AppUser(
-        id: credentials['id'] as String,
-        name: credentials['name'] as String,
-        email: email,
-        avatarUrl: null,
-      );
-      await _saveUser(user);
-      return user;
+    final parsed = jsonDecode(credentialsJson);
+    final credentialsList = parsed is List
+        ? parsed.whereType<Map<String, dynamic>>().toList()
+        : <Map<String, dynamic>>[parsed as Map<String, dynamic>];
+
+    for (final credentials in credentialsList) {
+      if (credentials['email'] == email && credentials['password'] == password) {
+        final user = AppUser(
+          id: credentials['id'] as String,
+          name: credentials['name'] as String,
+          email: email,
+          avatarUrl: null,
+        );
+        await _saveUser(user);
+        return user;
+      }
     }
 
     return null;
@@ -39,6 +45,13 @@ class AuthService {
 
   Future<bool> registerUser({required String username, required String email, required String password}) async {
     final prefs = await SharedPreferences.getInstance();
+    final credentialsJson = prefs.getString(_credentialsKey);
+    final parsed = credentialsJson == null ? null : jsonDecode(credentialsJson);
+    final credentialsList = parsed is List
+        ? parsed.whereType<Map<String, dynamic>>().toList()
+        : (parsed is Map<String, dynamic> ? <Map<String, dynamic>>[parsed] : <Map<String, dynamic>>[]);
+
+    final existingIndex = credentialsList.indexWhere((entry) => entry['email'] == email);
     final credentials = {
       'id': DateTime.now().millisecondsSinceEpoch.toString(),
       'name': username,
@@ -46,7 +59,13 @@ class AuthService {
       'password': password,
     };
 
-    await prefs.setString(_credentialsKey, jsonEncode(credentials));
+    if (existingIndex >= 0) {
+      credentialsList[existingIndex] = credentials;
+    } else {
+      credentialsList.add(credentials);
+    }
+
+    await prefs.setString(_credentialsKey, jsonEncode(credentialsList));
     return true;
   }
 

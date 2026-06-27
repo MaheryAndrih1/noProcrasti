@@ -12,8 +12,12 @@ https://github.com/MaheryAndrih1/noProcrasti
 - Création, modification et réordonnancement des tâches
 - Flux de travail démarrer / mettre en pause / terminer
 - Détection des tâches en retard et logique de suggestions
-- Persistance locale avec `SharedPreferences`
-- Support macOS avec fallback sur bureau pour l'authentification Google
+- Persistance locale avec une base Hive pour les tâches
+- Authentification locale par email et mot de passe
+
+## Dossier qualité
+
+Les livrables qualité sont regroupés dans [docs/README.md](docs/README.md).
 
 ## Pré-requis
 
@@ -37,11 +41,19 @@ export PATH="$PATH:/Users/maheriniainaandrianaivo/code/flutter/bin"
 flutter pub get
 ```
 
-3. Lancez l'application sur macOS :
+3. Lancez l'application sur votre plateforme Flutter disponible :
 
 ```bash
-flutter run -d macos
+flutter devices
+flutter run -d <device_id>
 ```
+
+Exemples de cibles possibles selon votre environnement :
+
+- `flutter run -d macos`
+- `flutter run -d windows`
+- `flutter run -d linux`
+- `flutter run -d chrome`
 
 4. Exécutez les tests unitaires :
 
@@ -68,26 +80,36 @@ docker run --rm -v "$PWD":/workspace -w /workspace noprocrasti-flutter flutter t
 ### Docker Compose :
 
 ```bash
-docker compose up --build
+docker compose up --build flutter
+docker compose up --build app
 ```
 
-> Remarque : le conteneur Docker est prévu pour l'automatisation de la compilation et des tests, pas pour lancer l'interface graphique macOS.
+> Remarque : `flutter` lance les tests dans le conteneur, et `app` expose l'application web sur http://localhost:3000.
 
 ## Configuration Git
 
-Si le dépôt n'est pas encore initialisé localement, exécutez :
+Le dépôt est déjà connecté à GitHub à l'adresse :
+https://github.com/MaheryAndrih1/noprocrasti.git
+
+Pour collaborer et pousser des changements :
 
 ```bash
-git init
+git status
 git add .
-git commit -m "Initialisation de noProcrasti avec Docker et README"
-git remote add origin https://github.com/MaheryAndrih1/noProcrasti.git
-git branch -M main
-git push -u origin main
+git commit -m "Ajout d'une fonctionnalité"
+git push origin main
 ```
+
+### Intégration Git dans l'application
+
+L'application permet actuellement :
+- la gestion locale des tâches,
+- la création de compte et la connexion via email/mot de passe,
+- la persistance des données sur le poste de l'utilisateur.
+
+Pour une prochaine étape, un vrai workflow Git intégré (ouvrir un dépôt, consulter l'historique, créer des commits depuis l'app) pourra être ajouté.
 
 ## Remarques
 
-- La version macOS est le runtime supporté actuellement dans ce dépôt.
-- L'authentification Google utilise un fallback local sur les plateformes de bureau.
-- L'assistant flottant apparaît uniquement lorsque l'application est en arrière-plan.
+- Le projet est documenté pour les plateformes Flutter disponibles dans votre environnement, avec une validation pratique sur le flux desktop et Docker/web du dépôt.
+- L'application utilise une authentification locale pour la démonstration.
